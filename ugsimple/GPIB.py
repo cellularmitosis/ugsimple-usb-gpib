@@ -165,14 +165,17 @@ class UGSimpleGPIB:
 		# Read USB a single byte to see if a valid command has been received
 		command = self.usb_read()[0]
 		if command != address:
-			print ("ERROR: '0x{0:2x}' does not match expected command '0x{0:2x}".format( command, address ) )
-			return None
+#			print ("ERROR: '0x{0:2x}' does not match expected command '0x{1:2x}".format( command, address ) )
+#			return None
+			# If the command doesn't match what was expected, try interpreting the first byte as the length.
+			# This seems to happen when issuing multiple read commands in a row.
+			length = command
+		else:
+			# Valid command, read next byte to determine length of command
+			length = self.usb_read()[0]
 
 		if self.debug_mode:
 			print ( "READ CMD:", command )
-
-		# Valid command, read next byte to determine length of command
-		length = self.usb_read()[0]
 
 		if self.debug_mode:
 			print ( "READ LEN:", length )
